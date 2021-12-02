@@ -27,9 +27,8 @@ course <- course %>%
          
 destination <- course %>%
   summarise(hoz_pos = sum(horiz_step),
-            final_dep = sum(depth_step))
-
-mult <- destination$hoz_pos*destination$final_dep
+            final_dep = sum(depth_step),
+            mult = hoz_pos * final_dep)
 
 ```
 
@@ -49,9 +48,8 @@ course <- course %>%
 
 destination2 <- course %>%
   summarise(hoz_pos = sum(horiz_step),
-            final_dep = sum(depth_step))
+            final_dep = sum(depth_step),
+            mult = hoz_pos * final_dep)
 
-mult2 <- destination2$hoz_pos*destination2$final_dep
-  
 ```
 
