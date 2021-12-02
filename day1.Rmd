@@ -8,7 +8,7 @@ Day 1 task 1: count the number of times a depth measurement increases from the p
 First, let's read in the data:
 
 ```{r}
-depth_meas <- as.numeric(readLines("input1.txt"))
+depth_meas <- as.numeric(readLines("data/input1.txt"))
 ```
 
 Calculate difference between subsequent rows and sum the positive ones:
