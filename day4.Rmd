@@ -1,0 +1,41 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(dplyr)
+```
+
+
+The input is tricky this time:
+
+```{r}
+bingo <- readLines("data/input4a.txt") 
+
+nums_drawn <- bingo[1] %>%
+  strsplit(",") %>%
+  unlist() %>%
+  as.numeric()
+
+boards <- bingo[-1]
+boards <- boards[boards!=""]  
+num_boards <- floor(length(boards)/5)
+
+board_entries <- boards %>%
+  strsplit("\\D+") %>%
+  unlist() %>%
+  as.numeric() %>%
+  na.omit()
+
+all_boards <- list()
+for (iboard in 1:num_boards) { 
+  all_boards[iboard] <- matrix( 
+    board_entries[(1:25)+(iboard-1)*25], # the data elements 
+    nrow=5,              # number of rows 
+    ncol=5,              # number of columns 
+    byrow = TRUE) 
+}
+```
+

@@ -1,0 +1,74 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+Let's read in our data:
+
+```{r}
+
+diagn <- readLines("data/input3.txt") %>%
+  strsplit("") %>%
+  purrr::map(as.integer) %>%
+  do.call(rbind,.)
+
+```
+
+You need to use the binary numbers in the diagnostic report to generate two new binary numbers (called the gamma rate and the epsilon rate). The power consumption can then be found by multiplying the gamma rate by the epsilon rate.
+
+Each bit in the gamma rate can be determined by finding the most common bit in the corresponding position of all numbers in the diagnostic report. 
+
+The epsilon rate is calculated in a similar way; rather than use the most common bit, the least common bit from each position is used.
+
+```{r}
+mean_diagn <- diagn %>%
+  apply(2,mean)
+
+gamma <- paste(as.numeric(mean_diagn>0.5),sep ="", collapse ="")
+epsilon <- paste(as.numeric(mean_diagn<0.5),sep ="", collapse ="")
+
+power <- strtoi(gamma,base=2)*strtoi(epsilon,base=2)
+  
+```
+
+Next, you should verify the life support rating, which can be determined by multiplying the oxygen generator rating by the CO2 scrubber rating.
+
+We'll need to build a function to filter the dataframe to keep the rows that satisfy the bit criteria, either most or least common
+
+```{r}
+filter_diagn <- function(df,criterion,whichbit){
+  mean_df <- mean(df[,whichbit])
+  if (criterion=="most_common"){
+    common_df <- as.numeric(mean_df>=0.5)
+    } else {
+      common_df <- as.numeric(mean_df<0.5)
+    }
+  new_df <- df[df[,whichbit]==common_df,]
+
+  if (!is.matrix(new_df)) {
+    return(paste(new_df,sep ="", collapse =""))
+  } else if (!nrow(new_df)) {
+    return(paste(df[1,],sep ="", collapse =""))
+  }
+  else {
+    filter_diagn(new_df,criterion,whichbit+1)
+  }
+}
+
+oxyg <- filter_diagn(diagn,"most_common",1)
+co2 <- filter_diagn(diagn,"least_common",1)
+
+life_support <- strtoi(oxyg,base=2)*strtoi(co2,base=2)
+print(life_support)
+
+```
+
+
+
+
+
+
