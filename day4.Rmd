@@ -4,7 +4,6 @@ output: html_notebook
 ---
 
 ```{r}
-library(readr)
 library(dplyr)
 ```
 
@@ -12,7 +11,7 @@ library(dplyr)
 The input is tricky this time:
 
 ```{r}
-bingo <- readLines("data/input4a.txt") 
+bingo <- readLines("data/input4.txt") 
 
 nums_drawn <- bingo[1] %>%
   strsplit(",") %>%
@@ -31,11 +30,75 @@ board_entries <- boards %>%
 
 all_boards <- list()
 for (iboard in 1:num_boards) { 
-  all_boards[iboard] <- matrix( 
+  all_boards[[iboard]] <- matrix( 
     board_entries[(1:25)+(iboard-1)*25], # the data elements 
     nrow=5,              # number of rows 
     ncol=5,              # number of columns 
     byrow = TRUE) 
 }
+
+all_initial_boards <- all_boards
+
+```
+
+We need to create a function to check for bingo:
+
+```{r}
+
+check_bingo <- function(aboard){
+  bingo = -1
+  for (i in 1:5){
+    if (all(is.na(aboard[,i])) || all(is.na(aboard[i,]))){
+      bingo = sum(aboard,na.rm = TRUE)
+      break
+    }
+  }
+  return(bingo)
+}
+
+all_boards <- all_initial_boards 
+final_score <- 0
+
+for (anumber in nums_drawn){
+  for (iboard in 1:num_boards){
+    all_boards[[iboard]][all_boards[[iboard]]==anumber] <- NA
+    bingo <- check_bingo(all_boards[[iboard]])
+    if (bingo!=-1){
+      final_score <- anumber*bingo
+      break
+    }
+  }
+  if (bingo!=-1){ break }
+}
+
+print(final_score)
+
+```
+For part two, we just need to keep going until the last board to get bingo (instead of breaking)
+
+```{r}
+
+all_boards <- all_initial_boards
+final_score <- 0
+boards_yet_to_win <- 1:num_boards
+check_boards <- boards_yet_to_win
+
+for (anumber in nums_drawn){
+  for (iboard in check_boards){
+    all_boards[[iboard]][all_boards[[iboard]]==anumber] <- NA
+    bingo <- check_bingo(all_boards[[iboard]])
+    if (bingo!=-1){
+      boards_yet_to_win <- boards_yet_to_win[boards_yet_to_win!=iboard]
+      if (!length(boards_yet_to_win)){
+        final_score <- anumber*bingo
+        break
+      }
+    }
+  }
+  check_boards <- boards_yet_to_win
+  if (!length(boards_yet_to_win)){ break }
+}
+
+print(final_score)
 ```
 
